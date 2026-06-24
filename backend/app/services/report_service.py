@@ -570,6 +570,17 @@ class ReportService:
             "Findings represent observed security weaknesses and do not imply active exploitation."
         )
         story.append(Paragraph(disclaimer_text, body_style))
+        story.append(Spacer(1, 20))
+        
+        end_style = ParagraphStyle(
+            name="EndOfReport",
+            fontName="Helvetica-Bold",
+            fontSize=10,
+            leading=13,
+            textColor=primary_color,
+            alignment=1
+        )
+        story.append(Paragraph("END OF REPORT", end_style))
         
         # Build document
         doc.build(story, canvasmaker=NumberedCanvas)
