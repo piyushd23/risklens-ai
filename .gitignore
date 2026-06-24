@@ -1,0 +1,34 @@
+# Version Control Ignores
+
+# Python Backend
+backend/venv/
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/crawler/__pycache__/
+backend/app/assessment/__pycache__/
+backend/app/ai/__pycache__/
+backend/app/services/__pycache__/
+backend/app/routers/__pycache__/
+backend/tests/__pycache__/
+
+# Databases
+backend/risklens_ai.db
+
+# Machine Learning Artifacts
+backend/app/ai/risk_model.pkl
+
+# Node Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/local.env
+
+# Generated Reports
+backend/reports/
+reports/
+
+# IDE and OS files
+.DS_Store
+.idea/
+.vscode/
+*.log
+*.sqlite
