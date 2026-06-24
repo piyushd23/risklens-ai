@@ -5,7 +5,7 @@ from typing import List
 import os
 
 from app.database import get_db
-from app.models import Report, Assessment, Finding, User, Analytics
+from app.models import Report, Assessment, Finding, User, Analytics, Asset
 from app.schemas import ReportResponse
 from app.auth import RoleChecker, get_current_user
 from app.services.report_service import ReportService
@@ -39,9 +39,31 @@ def generate_reports(assessment_id: int, db: Session = Depends(get_db),
     sec_score = recent_analytics.security_score if recent_analytics else 100.0
     comp_score = recent_analytics.compliance_score if recent_analytics else 100.0
     
+    # Gather assets for discovery stats and included scope URL listing
+    assets = db.query(Asset).filter(Asset.target_id == target.id).all()
+    assets_list = [{"url": a.url, "type": a.asset_type, "method": a.method, "cookies": a.cookies} for a in assets]
+    
+    pages = sum(1 for a in assets_list if a["type"] in ["page", "link"])
+    forms = sum(1 for a in assets_list if a["type"] == "form")
+    inputs = sum(1 for a in assets_list if a["type"] in ["input_field", "query_param", "post_param"])
+    cookies = sum(1 for a in assets_list if a["type"] == "cookie" or (a.get("cookies") and a["cookies"] != "{}"))
+    endpoints = sum(1 for a in assets_list if a["type"] == "page")
+    
+    discovery_stats = {
+        "pages_discovered": pages,
+        "forms_identified": forms,
+        "input_fields_identified": inputs,
+        "cookies_identified": cookies,
+        "endpoints_identified": endpoints,
+        "crawl_depth": target.crawl_depth or 3
+    }
+    
     findings_list = []
-    for f in findings:
+    for idx, f in enumerate(findings):
+        # Fetch priority score from risk_score if available
+        priority = f.risk_score.priority_score if f.risk_score else (f.cvss_score * 10)
         findings_list.append({
+            "id": f"F-{idx+1:03d}",
             "title": f.title,
             "description": f.description,
             "severity": f.severity,
@@ -51,12 +73,22 @@ def generate_reports(assessment_id: int, db: Session = Depends(get_db),
             "evidence": f.evidence,
             "risk_explanation": f.risk_explanation,
             "remediation_guidance": f.remediation_guidance,
+            "priority_score": priority
         })
         
-    # Generate files (JSON, HTML, PDF)
-    pdf_path = ReportService.generate_pdf(target.name, target.url, assess.started_at, sec_score, comp_score, findings_list)
-    html_path = ReportService.generate_html(target.name, target.url, assess.started_at, sec_score, comp_score, findings_list)
-    json_path = ReportService.generate_json(target.name, target.url, assess.started_at, sec_score, comp_score, findings_list)
+    # Generate files (JSON, HTML, PDF) dynamically
+    pdf_path = ReportService.generate_pdf(
+        target.name, target.url, assess.started_at, sec_score, comp_score, findings_list,
+        exclude_paths=target.exclude_paths, assets_list=assets_list, discovery_stats=discovery_stats
+    )
+    html_path = ReportService.generate_html(
+        target.name, target.url, assess.started_at, sec_score, comp_score, findings_list,
+        exclude_paths=target.exclude_paths, assets_list=assets_list, discovery_stats=discovery_stats
+    )
+    json_path = ReportService.generate_json(
+        target.name, target.url, assess.started_at, sec_score, comp_score, findings_list,
+        exclude_paths=target.exclude_paths, assets_list=assets_list, discovery_stats=discovery_stats
+    )
     
     generated_reports = []
     formats = [("pdf", pdf_path), ("html", html_path), ("json", json_path)]
