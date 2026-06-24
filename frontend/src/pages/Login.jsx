@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import Logo from '../components/Logo';
 import { Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function Login() {
@@ -17,16 +16,15 @@ export default function Login() {
     setLoading(true);
 
     try {
-      // Backend URL config
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const response = await axios.post(`${API_URL}/api/v1/auth/login`, {
         username,
         password,
       });
 
+
       const { access_token, role, username: resUser } = response.data;
       
-      // Store in session
       localStorage.setItem('token', access_token);
       localStorage.setItem('role', role);
       localStorage.setItem('username', resUser);
@@ -45,35 +43,53 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex flex-col justify-center items-center px-6 selection:bg-green-500 selection:text-black">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-6 selection:bg-green-100 selection:text-green-900">
       <div className="w-full max-w-md">
         
         {/* Logo Banner */}
         <div className="flex justify-center mb-8">
           <Link to="/">
-            <Logo />
+            <div className="flex items-center gap-3 select-none">
+              <svg className="w-10 h-10" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M100 20C135 20 170 30 170 30V100C170 145 135 175 100 185C65 175 30 145 30 100V30C30 30 65 20 100 20Z" stroke="#22C55E" strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" fill="#F0FDF4" />
+                <circle cx="100" cy="55" r="5" fill="#4ADE80" />
+                <circle cx="70" cy="90" r="5" fill="#4ADE80" />
+                <circle cx="130" cy="90" r="5" fill="#4ADE80" />
+                <circle cx="100" cy="125" r="5" fill="#4ADE80" />
+                <line x1="100" y1="55" x2="70" y2="90" stroke="#22C55E" strokeWidth="2" strokeDasharray="3 3" />
+                <line x1="100" y1="55" x2="130" y2="90" stroke="#22C55E" strokeWidth="2" strokeDasharray="3 3" />
+                <line x1="70" y1="90" x2="100" y2="125" stroke="#22C55E" strokeWidth="2" strokeDasharray="3 3" />
+                <line x1="130" y1="90" x2="100" y2="125" stroke="#22C55E" strokeWidth="2" strokeDasharray="3 3" />
+                <line x1="100" y1="55" x2="100" y2="125" stroke="#22C55E" strokeWidth="1" />
+                <circle cx="100" cy="95" r="30" stroke="#4ADE80" strokeWidth="6" fill="none" strokeDasharray="90 10" />
+                <line x1="121" y1="116" x2="140" y2="135" stroke="#4ADE80" strokeWidth="6" strokeLinecap="round" />
+              </svg>
+              <span className="font-extrabold text-2xl tracking-tight text-green-950">
+                RiskLens<span className="text-green-600">AI</span>
+              </span>
+            </div>
           </Link>
         </div>
 
         {/* Card */}
-        <div className="dark-glass-panel border border-emerald-950 p-8 rounded-2xl shadow-2xl relative">
-          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-green-500 to-emerald-400 rounded-t-2xl"></div>
+        <div className="glass-panel border border-green-200 p-8 rounded-3xl shadow-lg relative bg-white">
+          <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-green-500 to-emerald-400 rounded-t-3xl"></div>
 
-          <h2 className="text-2xl font-bold text-center text-white mb-2">Secure Gateway Login</h2>
-          <p className="text-xs text-neutral-400 text-center mb-6">Enter credentials to authenticate session token.</p>
+          <h2 className="text-2xl font-bold text-center text-green-950 mb-2">Secure Gateway Login</h2>
+          <p className="text-xs text-neutral-500 text-center mb-6 font-medium">Enter credentials to authenticate session token.</p>
 
           {error && (
-            <div className="bg-red-950/40 border border-red-500/20 px-4 py-3 rounded-lg flex items-center gap-3 mb-6">
-              <AlertCircle className="w-5 h-5 text-red-400 shrink-0" />
-              <span className="text-xs text-red-200">{error}</span>
+            <div className="bg-red-50 border border-red-200 px-4 py-3 rounded-xl flex items-center gap-3 mb-6">
+              <AlertCircle className="w-5 h-5 text-red-500 shrink-0" />
+              <span className="text-xs text-red-800 font-semibold">{error}</span>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1.5">Username</label>
+              <label className="block text-xs font-bold text-green-800 uppercase tracking-wider mb-1.5">Username</label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-neutral-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-green-700">
                   <User className="w-4 h-4" />
                 </span>
                 <input
@@ -81,16 +97,16 @@ export default function Login() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="w-full bg-neutral-900 border border-neutral-800 focus:border-green-500 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-neutral-600 outline-none transition-all"
+                  className="w-full bg-slate-50 border border-green-100 focus:border-green-500 rounded-xl py-2.5 pl-10 pr-4 text-sm text-green-950 placeholder-neutral-400 outline-none transition-all focus:bg-white"
                   placeholder="e.g. admin"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-neutral-400 uppercase tracking-wider mb-1.5">Password</label>
+              <label className="block text-xs font-bold text-green-800 uppercase tracking-wider mb-1.5">Password</label>
               <div className="relative">
-                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-neutral-500">
+                <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-green-700">
                   <Lock className="w-4 h-4" />
                 </span>
                 <input
@@ -98,7 +114,7 @@ export default function Login() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-neutral-900 border border-neutral-800 focus:border-green-500 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white placeholder-neutral-600 outline-none transition-all"
+                  className="w-full bg-slate-50 border border-green-100 focus:border-green-500 rounded-xl py-2.5 pl-10 pr-4 text-sm text-green-950 placeholder-neutral-400 outline-none transition-all focus:bg-white"
                   placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;"
                 />
               </div>
@@ -107,7 +123,7 @@ export default function Login() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-green-500 hover:bg-green-400 disabled:bg-neutral-800 text-black disabled:text-neutral-500 font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-lg shadow-green-500/10 cursor-pointer transition-all active:scale-[0.98]"
+              className="w-full bg-green-500 hover:bg-green-650 disabled:bg-slate-200 text-white disabled:text-neutral-400 font-bold py-3 rounded-xl flex items-center justify-center gap-2 shadow-md shadow-green-500/10 cursor-pointer transition-all active:scale-[0.98]"
             >
               {loading ? (
                 <>
@@ -120,16 +136,16 @@ export default function Login() {
           </form>
 
           {/* Quick Access Details */}
-          <div className="mt-8 pt-6 border-t border-neutral-900 text-center">
-            <span className="text-xs text-neutral-500">Need an analyst profile? </span>
-            <Link to="/register" className="text-xs text-green-400 hover:underline">Register Account</Link>
+          <div className="mt-8 pt-6 border-t border-green-100 text-center">
+            <span className="text-xs text-neutral-500 font-medium">Need an analyst profile? </span>
+            <Link to="/register" className="text-xs text-green-600 font-bold hover:underline">Register Account</Link>
           </div>
           
-          <div className="mt-4 bg-neutral-900/60 p-3 rounded-lg border border-neutral-800/40 text-[10px] text-neutral-500 space-y-1">
-            <div className="font-bold text-neutral-400">Quick Test Credentials:</div>
-            <div>&bull; Admin: <code className="text-green-400">admin</code> / <code className="text-green-400">AdminPassword123!</code></div>
-            <div>&bull; Analyst: <code className="text-green-400">analyst</code> / <code className="text-green-400">AnalystPassword123!</code></div>
-            <div>&bull; Developer: <code className="text-green-400">developer</code> / <code className="text-green-400">DeveloperPassword123!</code></div>
+          <div className="mt-4 bg-green-50/30 p-3 rounded-xl border border-green-100/50 text-[10px] text-green-900/70 space-y-1">
+            <div className="font-bold text-green-900">Quick Test Credentials:</div>
+            <div>&bull; Admin: <code className="text-green-700 font-bold">admin</code> / <code className="text-green-700">AdminPassword123!</code></div>
+            <div>&bull; Analyst: <code className="text-green-700 font-bold">analyst</code> / <code className="text-green-700">AnalystPassword123!</code></div>
+            <div>&bull; Developer: <code className="text-green-700 font-bold">developer</code> / <code className="text-green-700">DeveloperPassword123!</code></div>
           </div>
         </div>
       </div>
